@@ -1,0 +1,13 @@
+name = "Quaternion"
+uuid = "74eca876-718d-486b-80f4-5251a73a300f"
+authors = ["Brayden Barton <brayden.barton@usu.edu> and contributors"]
+version = "0.1.0"
+
+[compat]
+julia = "1"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
