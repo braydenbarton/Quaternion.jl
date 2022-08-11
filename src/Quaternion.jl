@@ -1,4 +1,4 @@
-module Quaternions
+module Quaternion
 export ⊗, qconj, qvq, qnorm, qinv
 
 """
