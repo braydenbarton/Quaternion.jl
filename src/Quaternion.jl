@@ -44,11 +44,11 @@ q_to_axis_angle(q::Vector) = @views (q[2:4]/norm(q[2:4]), 2*atan(norm(q[2:4]), q
 "Converts a rotation quaternion to a rotation matrix"
 function q2mat(q::Vector)
     s = qnorm(q) ^ -2
-    qr, qi, qj, qk = q
+    qw, qx, qy, qz = q
     [
-        1 - 2s*(qj^2 + qk^2)    2s*(qi*qj - qk*qr)      2s*(qi*qk + qj*qr);
-        2s*(qi*qj + qk*qr)      1 - 2s*(qi^2 + qk^2)    2s*(qj*qk - qi*qr);
-        2s*(qi*qk - qj*qr)      2s*(qj*qk + qi*qr)      1 - 2s*(qi^2 + qj^2)
+        1 - 2s*(qy^2 + qz^2)    2s*(qx*qy - qz*qw)      2s*(qx*qz + qy*qw);
+        2s*(qx*qy + qz*qw)      1 - 2s*(qx^2 + qz^2)    2s*(qy*qz - qx*qw);
+        2s*(qx*qz - qy*qw)      2s*(qy*qz + qx*qw)      1 - 2s*(qx^2 + qy^2)
     ]
 end
 
