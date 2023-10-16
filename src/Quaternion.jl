@@ -27,7 +27,7 @@ Calculates the conjugate of the given quaternion.
 qconj(q::Vector) = [q[1]; -q[2:4]]
 
 "Shorthand function for rotating a 3-element vector with the given quaternion"
-qvq(q::Vector, v::Vector) = @view (q⊗[0; v]⊗qconj(q))[2:4]
+qvq(q::Vector, v::Vector) = (q⊗[0; v]⊗qconj(q))[2:4]
 
 "Calculates the norm of a quaternion without using the LinearAlgebra package"
 qnorm(q::Vector) = sqrt(q[1]^2 + q[2]^2 + q[3]^2 + q[4]^2)
