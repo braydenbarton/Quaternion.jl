@@ -20,7 +20,7 @@ r3vec(vec::R3Vec) = vec
 Defines the quaternion composition operation for right-handed quaternions of the form [w; x; y; z] where `w` is 
 the scalar component and `xyz` are the vector components.
 """
-function ⊗(p::Quat, q::Quat)
+function qcomp(p::Quat, q::Quat)
     pw, px, py, pz = p
     qw, qx, qy, qz = q
     SVector{4}([
@@ -30,9 +30,9 @@ function ⊗(p::Quat, q::Quat)
         pw*qz + px*qy - py*qx + pz*qw
     ])
 end
-qcomp(p, q) = ⊗(p, q)
+⊗(p, q) = qcomp(p, q)
 "AbstractVector wrapping for old code"
-⊗(p::T1, q::T2) where {T1<:AbstractVector, T2<:AbstractVector} = (⊗(quat(p), quat(q)))
+qcomp(p::AbstractVector, q::AbstractVector) = (⊗(quat(p), quat(q)))
 
 """
     qconj(q)
@@ -40,11 +40,11 @@ qcomp(p, q) = ⊗(p, q)
 Calculates the conjugate of the given quaternion.
 """
 qconj(q::Quat) = SVector{4}([q[1]; -q[2:4]])
-qconj(q::T) where T<:AbstractVector = qconj(quat(q))
+qconj(q::AbstractVector) = qconj(quat(q))
 
 "Shorthand function for rotating a 3-element vector with the given quaternion"
 qvq(q::Quat, v::R3Vec) = SVector{3}((q ⊗ [0; v] ⊗ qconj(q))[2:4])
-qvq(q::T1, v::T2) where {T1<:AbstractVector, T2<:AbstractVector} = qvq(quat(q), SizedVector{3}(v))
+qvq(q::AbstractVector, v::AbstractVector) = qvq(quat(q), r3vec(v))
 
 "Calculates the norm of a quaternion without using the LinearAlgebra package"
 qnorm(q::Quat) = sqrt(q[1]^2 + q[2]^2 + q[3]^2 + q[4]^2)
@@ -52,11 +52,11 @@ qnorm(q::AbstractVector) = qnorm(quat(q))
 
 "Calculates the inverse of a quaternion in an efficient fashion"
 qinv(q::Quat) = qconj(q) / (q[1]^2 + q[2]^2 + q[3]^2 + q[4]^2)
-qinv(q::T) where T<:AbstractVector = qinv(quat(q))
+qinv(q::AbstractVector) = qinv(quat(q))
 
 "Converts an axis of rotation and an angle of rotation (in radians) to a quaternion"
 axis_angle_to_q(vec::R3Vec, θ::Real) = SVector([cos(θ/2); vec/norm(vec)*sin(θ/2)])
-axis_angle_to_q(vec::AbstractVector, θ::Real) = axis_angle_to_q(SizedVector{3}(vec), θ)
+axis_angle_to_q(vec::AbstractVector, θ::Real) = axis_angle_to_q(r3vec(vec), θ)
 
 "Recovers the axis-angle representation from a quaternion"
 q_to_axis_angle(q::R3Vec) = @views (q[2:4]/norm(q[2:4]), 2*atan(norm(q[2:4]), q[1]))
