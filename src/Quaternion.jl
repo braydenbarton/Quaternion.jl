@@ -7,8 +7,11 @@ export ⊗, qcomp, qconj, qvq, qnorm, qinv, axis_angle_to_q, q_to_axis_angle, q2
 "Abstract quaternion representation"
 const Quat{T} = StaticVector{4, T} where T<:Real
 quat(q::AbstractVector) = SizedVector{4}(q)
+quat(q::Quat) = q
 "Abstract representation for real 3-vecs (position, velocity, angular velocity, etc)"
-const RealVec{T} = StaticVector{3, T} where T<:Real
+const R3Vec{T} = StaticVector{3, T} where T<:Real
+r3vec(vec::AbstractVector) = SizedVector{3}(vec)
+r3vec(vec::R3Vec) = vec
 
 """
     ⊗(p, q)
@@ -40,7 +43,7 @@ qconj(q::Quat) = SVector{4}([q[1]; -q[2:4]])
 qconj(q::T) where T<:AbstractVector = qconj(quat(q))
 
 "Shorthand function for rotating a 3-element vector with the given quaternion"
-qvq(q::Quat, v::RealVec) = SVector{3}((q ⊗ [0; v] ⊗ qconj(q))[2:4])
+qvq(q::Quat, v::R3Vec) = SVector{3}((q ⊗ [0; v] ⊗ qconj(q))[2:4])
 qvq(q::T1, v::T2) where {T1<:AbstractVector, T2<:AbstractVector} = qvq(quat(q), SizedVector{3}(v))
 
 "Calculates the norm of a quaternion without using the LinearAlgebra package"
@@ -52,11 +55,11 @@ qinv(q::Quat) = qconj(q) / (q[1]^2 + q[2]^2 + q[3]^2 + q[4]^2)
 qinv(q::T) where T<:AbstractVector = qinv(quat(q))
 
 "Converts an axis of rotation and an angle of rotation (in radians) to a quaternion"
-axis_angle_to_q(vec::RealVec, θ::Real) = SVector([cos(θ/2); vec/norm(vec)*sin(θ/2)])
+axis_angle_to_q(vec::R3Vec, θ::Real) = SVector([cos(θ/2); vec/norm(vec)*sin(θ/2)])
 axis_angle_to_q(vec::AbstractVector, θ::Real) = axis_angle_to_q(SizedVector{3}(vec), θ)
 
 "Recovers the axis-angle representation from a quaternion"
-q_to_axis_angle(q::RealVec) = @views (q[2:4]/norm(q[2:4]), 2*atan(norm(q[2:4]), q[1]))
+q_to_axis_angle(q::R3Vec) = @views (q[2:4]/norm(q[2:4]), 2*atan(norm(q[2:4]), q[1]))
 q_to_axis_angle(q::AbstractVector) = q_to_axis_angle(quat(q))
 
 "Converts a rotation quaternion to a rotation matrix"
@@ -72,7 +75,7 @@ end
 q2mat(q::AbstractVector) = q2mat(quat(q))
 
 "Converts an axis of rotation and an angle of rotation (in radians) to a rotation matrix"
-axis_angle_to_mat(vec::RealVec, θ::Real) = q2mat(axis_angle_to_q(vec, θ))
+axis_angle_to_mat(vec::R3Vec, θ::Real) = q2mat(axis_angle_to_q(vec, θ))
 
 "Recovers the axis-angle representation from a rotation matrix"
 function mat_to_axis_angle(R::Matrix)
